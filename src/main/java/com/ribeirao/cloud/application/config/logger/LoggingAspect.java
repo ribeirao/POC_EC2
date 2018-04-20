@@ -20,6 +20,22 @@ public class LoggingAspect {
 
     public LoggingAspect() {}
 
+    static String getString(JoinPoint joinPoint) {
+        StringBuilder builder = new StringBuilder();
+
+        Class aClass = joinPoint.getSignature().getDeclaringType();
+        MethodSignature method = (MethodSignature) joinPoint.getSignature();
+
+        String className = aClass.getSimpleName();
+        String methodName = method.getName();
+
+        builder.append(className);
+        builder.append(".");
+        builder.append(methodName);
+
+        return builder.toString();
+    }
+
     @Pointcut("execution(public * *(..))")
     public void publicMethod() {}
 
@@ -53,22 +69,6 @@ public class LoggingAspect {
     @SuppressWarnings("rawtypes")
     private String generateMethodCallDescription(JoinPoint joinPoint) throws NoSuchMethodException {
         return getString(joinPoint);
-    }
-
-    static String getString(JoinPoint joinPoint) {
-        StringBuilder builder = new StringBuilder();
-
-        Class aClass = joinPoint.getSignature().getDeclaringType();
-        MethodSignature method = (MethodSignature) joinPoint.getSignature();
-
-        String className = aClass.getSimpleName();
-        String methodName = method.getName();
-
-        builder.append(className);
-        builder.append(".");
-        builder.append(methodName);
-
-        return builder.toString();
     }
 
 }

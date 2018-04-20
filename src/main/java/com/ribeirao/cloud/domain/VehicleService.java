@@ -7,15 +7,20 @@ import com.ribeirao.cloud.application.config.exception.NotFoundException;
 import com.ribeirao.cloud.application.dto.VehicleCommand;
 import com.ribeirao.cloud.application.dto.VehicleTypeCommand;
 import com.ribeirao.cloud.port.adapter.persistence.VehicleRepository;
+import com.ribeirao.cloud.port.adapter.persistence.VehicleTypeRepository;
 
 @Service
 public class VehicleService {
 
     private final VehicleRepository vehicleRepository;
 
+    private final VehicleTypeRepository vehicleTypeRepository;
+
     @Autowired
-    public VehicleService(VehicleRepository vehicleRepository) {
+    public VehicleService(VehicleRepository vehicleRepository,
+            VehicleTypeRepository vehicleTypeRepository) {
         this.vehicleRepository = vehicleRepository;
+        this.vehicleTypeRepository = vehicleTypeRepository;
     }
 
     public VehicleCommand createVehicle(VehicleCommand command) {
@@ -42,16 +47,14 @@ public class VehicleService {
 
     private Vehicle convertCommandToEntity(VehicleCommand command) {
         return new Vehicle(command.getName(), command.getDesc(),
-                new VehicleType(command.getType().getName(), command.getType().getDesc()),
-                command.getPlate());
+                verifyAndSaveType(command.getType()), command.getPlate());
     }
 
     private void applyUpdatedValues(Vehicle vehicle, VehicleCommand command) {
         vehicle.setName(command.getName());
         vehicle.setDescription(command.getDesc());
         vehicle.setPlate(command.getPlate());
-        vehicle.getType().setDescription(command.getType().getDesc());
-        vehicle.getType().setName(command.getType().getName());
+        vehicle.setType(verifyAndSaveType(command.getType()));
     }
 
     private VehicleCommand convertEntityToCommand(Vehicle vehicle) {
@@ -59,5 +62,14 @@ public class VehicleService {
                 new VehicleTypeCommand(vehicle.getType().getId(), vehicle.getType().getName(),
                         vehicle.getType().getDescription()),
                 vehicle.getPlate());
+    }
+
+    private VehicleType verifyAndSaveType(VehicleTypeCommand typeCommand) {
+        return vehicleTypeRepository.findOneByName(typeCommand.getName())
+                .orElse(vehicleTypeRepository.save(convertTypeCommandToEntity(typeCommand)));
+    }
+
+    private VehicleType convertTypeCommandToEntity(VehicleTypeCommand typeCommand) {
+        return new VehicleType(typeCommand.getName(), typeCommand.getDesc());
     }
 }

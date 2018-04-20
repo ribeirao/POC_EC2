@@ -1,11 +1,11 @@
 package com.ribeirao.cloud.application.config.logger;
 
-import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.reflect.MethodSignature;
-
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.reflect.MethodSignature;
 
 public class ReflectionHelper {
 
@@ -71,7 +71,7 @@ public class ReflectionHelper {
     }
 
     private static StringBuilder generateParamDescription(Class<?> parameterType, Object value,
-                                                          Annotation[] annotations) {
+            Annotation[] annotations) {
         StringBuilder builder = new StringBuilder();
         builder.append(parameterType.getSimpleName());
         builder.append(": ");
