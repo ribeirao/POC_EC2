@@ -18,4 +18,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .body(new Errors(new Object[] {e.getMessage()}));
     }
 
+    @ExceptionHandler(value = MandatoryFieldException.class)
+    public ResponseEntity<Errors> handleException(MandatoryFieldException e) {
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getErrors());
+    }
+
 }

@@ -1,8 +1,12 @@
 package com.ribeirao.cloud.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ribeirao.cloud.application.config.exception.MandatoryFieldException;
 import com.ribeirao.cloud.application.config.exception.NotFoundException;
 import com.ribeirao.cloud.application.dto.VehicleCommand;
 import com.ribeirao.cloud.application.dto.VehicleTypeCommand;
@@ -24,10 +28,12 @@ public class VehicleService {
     }
 
     public VehicleCommand createVehicle(VehicleCommand command) {
+        validateCommands(command);
         return convertEntityToCommand(vehicleRepository.save(convertCommandToEntity(command)));
     }
 
     public VehicleCommand editVehicle(Integer id, VehicleCommand command) throws NotFoundException {
+        validateCommands(command);
         Vehicle vehicle = vehicleRepository.findById(id).orElseThrow(NotFoundException::new);
 
         applyUpdatedValues(vehicle, command);
@@ -71,5 +77,19 @@ public class VehicleService {
 
     private VehicleType convertTypeCommandToEntity(VehicleTypeCommand typeCommand) {
         return new VehicleType(typeCommand.getName(), typeCommand.getDesc());
+    }
+
+    private void validateCommands(VehicleCommand command) {
+        List<String> errors = new ArrayList<>();
+
+        if (command.getType() == null)
+            errors.add("O campo type deve ser preenchido");
+
+        if (command.getName() == null)
+            errors.add("O campo name deve ser preenchido");
+
+        if (!errors.isEmpty())
+            throw new MandatoryFieldException(errors);
+
     }
 }
